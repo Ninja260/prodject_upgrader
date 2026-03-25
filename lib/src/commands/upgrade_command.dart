@@ -28,7 +28,8 @@ class UpgradeCommand extends Command<int> {
         help: 'Modify the sdk version',
       )
       ..addOption(
-        'package-parent',
+        'local-packages-parent',
+        abbr: 'l',
         help: 'The parent path of local packages',
         // defaultsTo: 'packages',
       );
@@ -61,7 +62,7 @@ class UpgradeCommand extends Command<int> {
       return ExitCode.usage.code;
     }
 
-    var packageParent = argResults?['package-parent'] as String?;
+    var packageParent = argResults?['local-packages-parent'] as String?;
 
     if (packageParent != null) {
       packageParent = p.join(path, packageParent);
