@@ -137,8 +137,9 @@ class UpgradeCommand extends Command<int> {
 
       final baseName = p.basename(dir);
 
-      final progress = _logger.progress('Upgrading $baseName');
-      final result = await Process.run(
+      // Run upgrade
+      var progress = _logger.progress('Upgrading $baseName');
+      var result = await Process.run(
         switch (packageType) {
           PackageType.dart => 'dart',
           PackageType.flutter => 'flutter',
@@ -147,10 +148,28 @@ class UpgradeCommand extends Command<int> {
         runInShell: true,
         workingDirectory: dir,
       );
-      progress.complete('$baseName is upgraded!');
 
       if (result.exitCode != 0) {
         progress.fail('Failed to upgrade $baseName');
+        throw Exception(result.stderr.toString());
+      } else {
+        progress.complete('Upgraded $baseName');
+      }
+
+      // run dart fix
+      progress = _logger.progress('Running dart fix $baseName');
+      result = await Process.run(
+        'dart',
+        ['fix', '--apply'],
+        runInShell: true,
+        workingDirectory: dir,
+      );
+
+      if (result.exitCode != 0) {
+        progress.fail('Running dart fix failed: $baseName');
+        throw Exception(result.stderr.toString());
+      } else {
+        progress.complete('Dart fix complete: $baseName');
       }
     } on Object catch (e) {
       _logger.err(e.toString());
