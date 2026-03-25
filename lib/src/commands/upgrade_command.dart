@@ -76,14 +76,14 @@ class UpgradeCommand extends Command<int> {
     final dir = p.basename(path);
     _logger.info('Started upgrading project: $dir\n');
 
-    await _upgradePackage(path, isToModifySdk);
-
     if (packageParent != null) {
       final directories = await _getDirectoriesAsync(packageParent);
       for (final directory in directories) {
         await _upgradePackage(directory.absolute.path, isToModifySdk);
       }
     }
+
+    await _upgradePackage(path, isToModifySdk);
 
     return ExitCode.success.code;
   }
